@@ -139,6 +139,7 @@
                     <div class="text-center mt-3">
                         <button class="btn btn-success" onclick="checkout()">Checkout</button>
                         <button class="btn btn-warning" onclick="clearCart()" id="clearBtn">Clear</button>
+                        <button class="btn btn-dark" onclick="printReceipt()" id="print">print</button>
                     </div>
                     <div id="qr-code" class="text-center mt-3"></div>
                 </div>
@@ -148,7 +149,7 @@
     <script>
         var total;
         localStorage.setItem("isLoggedIn", "false");
-
+        document.getElementById("print").style.display = "none";
         document.getElementById("year").textContent = new Date().getFullYear();
 
         var checkoutclicked;
@@ -202,6 +203,7 @@
             { id: 47, name: 'Curd Rice', fullPrice: 50, halfPrice: 30, imgSource: "./images/Curd Rice.jpg" }
         ];
         const cart = [];
+        let  HotelName;
         function login() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
@@ -211,6 +213,7 @@
 
                 document.getElementById("logoimages").innerHTML = `<img src="images/tajdeccanlogo.png"  alt="Taj Deccan" style="height: 85px; object-fit: cover;">`;
                 document.getElementById("hotelName").innerHTML = `Welcome To  Taj Deccan`;
+                HotelName = 'Taj Deccan'; 
                 showMenu();
             }
             else if (username.toLowerCase() === "thegolkondahotel" && password.toLowerCase() === "1234") {
@@ -218,6 +221,7 @@
                 document.getElementById("logoimages").innerHTML = `<img src="images/thegolkondahotellogo.png"  alt="The Golkonda Hotel" style="height: 85px; object-fit: cover;">`;
 
                 document.getElementById("hotelName").innerHTML = `Welcome To The Golkonda Hotel`;
+                HotelName = 'The Golkonda Hotel'; 
                 showMenu();
             }
             else if (username.toLowerCase() === "admin" && password.toLowerCase() === "1234") {
@@ -225,6 +229,7 @@
                 document.getElementById("logoimages").innerHTML = `<img src="images/logo.png"  alt="Logo" style="height: 85px;border-radius: 50%; object-fit: cover;">`;
 
                 document.getElementById("hotelName").innerHTML = `Welcome To Admin`;
+                HotelName = 'Admin'; 
                 showMenu();
             }
             else if (username.toLowerCase() === "itckohenur" && password.toLowerCase() === "1234") {
@@ -232,6 +237,7 @@
                 document.getElementById("logoimages").innerHTML = `<img src="images/itckohenurlogo.png"  alt="ITC Kohenur" style="height: 85px; object-fit: cover;">`;
 
                 document.getElementById("hotelName").innerHTML = `Welcome To ITC Kohenur`;
+                HotelName = 'ITC Kohenur'; 
                 showMenu();
             }
             else {
@@ -374,19 +380,21 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     if (result.value === 'cash') {
-                       
                         Swal.fire({
                             icon: 'success',
                             title: 'Order Confirmed!',
                             text: 'You have chosen to pay with Cash. Thank you!',
                             confirmButtonText: 'OK'
                         }).then(() => {
-                    cart.length = 0; 
-                    displayCart(); 
-                    document.getElementById("clearBtn").disabled = false;
-                });
+                            // cart.length = 0;
+                            displayCart();
+                            document.getElementById("clearBtn").disabled = false;
+                            document.getElementById("print").style.display = "block";
+                            
+                        });
                     } else {
                         generateQRCode(total);
+                        document.getElementById("print").style.display = "block";
                     }
                 }
             });
@@ -466,16 +474,17 @@
         }
         function clearCart() {
             if (cart.length != 0) {
-              
+
                 const qrCodeDiv = document.getElementById('qr-code');
                 qrCodeDiv.innerHTML = '';
                 displayCart();
                 var result = confirm('🛒 Cart has been cleared.');
                 console.log("Confirm result:", result); // Debugging statement
-                if (result == true ) {
+                if (result == true) {
                     total = 0;
                     cart.length = 0;
                     console.log("Total has been reset to 0");
+                    document.getElementById("print").style.display = "none";
                     displayCart();
                 } else {
 
@@ -486,6 +495,52 @@
             else {
                 alert('🛒 Cartis empty.');
             }
+        }
+
+
+        let orderCount = 0; 
+        function printReceipt() {
+            orderCount ++;
+            if (cart.length === 0) {
+                alert("Cart is empty. No receipt to print.");
+                return;
+            }
+            const now = new Date();
+            const dateTime = now.toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' });
+            let orderSummary = "<div style='display:flex; justify-content:center'>";
+
+             orderSummary = `<h2>Order Details</h2>
+                <h1>Order Count: ${orderCount}</h1>`
+             orderSummary += dateTime;
+            orderSummary += "<table  width='100%' style='display:flex; border: transparent; '>";
+            orderSummary += "<tr><th>Item</th><th style='Margin-left : 50px'>Quantity</th><th style='Margin-left : 50px'>Price</th></tr>";
+
+            let totalAmount = 0;
+            cart.forEach(item => {
+                let itemTotal = item.price * item.quantity;
+                totalAmount += itemTotal;
+                orderSummary += `<tr>
+            <td>${item.name} (${item.portion})</td>
+            <td style="text-align:center">${item.quantity}</td>
+            <td>₹${itemTotal}</td>
+        </tr>`;
+            });
+
+            orderSummary += `</table>
+     <hr/>
+    <h3>Total Amount: ₹${totalAmount}</h3>
+    <hr/>
+    <p>Thank you for your Visit!</p>`;
+    orderSummary += "</div>"
+            let printWindow = window.open('', '', 'width=600,height=600');
+            printWindow.document.write('<html><head><title>Receipt</title></head><body>');
+            printWindow.document.write(orderSummary);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+            cart.length = 0;
+            displayCart();
+            document.getElementById("print").style.display = "none";
         }
         displayMenu();
     </script>
