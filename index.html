@@ -62,7 +62,6 @@
 </head>
 <body class="bg-light">
     <div id="login-section">
-
         <div class="container-fluid">
             <div style="display: flex; justify-content: center;">
                 <img src="images/logo.png" alt="Logo here" height="20%" width="20%">
@@ -131,6 +130,7 @@
     <script>
         var total;
         let paymentmethod='';
+         let HotelName='';
         localStorage.setItem("isLoggedIn", "false");
         document.getElementById("print").style.display = "none";
         document.getElementById("year").textContent = new Date().getFullYear();
@@ -460,7 +460,8 @@
             const dateTime = now.toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' });
             let orderSummary = "<div style='display:flex; justify-content:center'>";
 
-             orderSummary = `<h2>Order Details</h2>
+             orderSummary = `<h2> ${HotelName} </h2>
+                    <h3>Order Details</h3>
                 <h1>Order Count: ${orderCount}</h1>`
                 orderSummary +=` <h3> paymentmethod  :${paymentmethod}</h3>` 
              orderSummary += dateTime;
