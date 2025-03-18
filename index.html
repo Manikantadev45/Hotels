@@ -11,61 +11,48 @@
         #homepage {
             display: none;
         }
-
         .form-group {
             margin-bottom: 20px;
         }
-
         .txtcolor {
             font-size: 14px;
             font-weight: 800;
             color: #795626;
         }
-
         label {
             margin-bottom: 10px;
         }
-
         input {
             height: 50px;
         }
-
         .loginbtn {
             margin-top: 20px;
         }
-
         .btnAdd {
             background-color: #ECB159;
             color: whitesmoke;
             border-color: transparent;
         }
-
         .Heading {
             color: #762C08;
             font-style: oblique;
         }
-
         .itemNames {
             color: #B67352;
         }
-
         .swal2-radio label {
-
             display: flex;
             flex-wrap: nowrap;
             flex-direction: column-reverse;
         }
-
         .swal2-radio input {
             position: absolute;
             height: 20px;
             width: 20px;
         }
-
         .swal2-radio span {
             margin-left: 40px;
         }
-
         .logoimages {
             position: absolute;
             border: #795626 solid 2px;
@@ -73,7 +60,6 @@
         }
     </style>
 </head>
-
 <body class="bg-light">
     <div id="login-section">
 
@@ -86,7 +72,6 @@
                 <div id="login-column" class="col-md-4">
                     <div id="login-box" class="col-md-12">
                         <form id="login-form" class="form" action="" method="post">
-
                             <div class="form-group">
                                 <label for="username" class="txtcolor"><b>User Name :</b></label><br>
                                 <input type="text" name="username" id="username" class="form-control">
@@ -108,9 +93,7 @@
                 &copy; <span id="year"></span> All Rights Reserved By Manikanta.
             </footer>
         </div>
-
     </div>
-
     <div class="container-fluid " id="homepage" style="background-color:#FEFBF6 ; ">
         <div id="logoimages" class="logoimages"> </div>
         <h1 class="text-center mb-4 Heading" style=" padding-top: 20px;" id="hotelName"></h1>
@@ -119,7 +102,6 @@
     border: transparent;"><img src="images/logoutImage.png" height="50" width="50" alt="LogOut"></button>
         </div>
         <div class="row">
-
             <div class="col-md-8 ">
                 <input type="search" id="searchInput" style="    margin-bottom: 1.5rem !important;"
                     class="form-control mb-2" placeholder="Search for items" oninput="searchMenu()">
@@ -148,10 +130,10 @@
     </div>
     <script>
         var total;
+        let paymentmethod='';
         localStorage.setItem("isLoggedIn", "false");
         document.getElementById("print").style.display = "none";
         document.getElementById("year").textContent = new Date().getFullYear();
-
         var checkoutclicked;
         const menuItems = [
             { id: 1, name: 'Breakfast Combo', fullPrice: 150, imgSource: "./images/Breakfast-combo.jpg" },
@@ -244,12 +226,10 @@
                 Swal.fire('Error', 'Invalid credentials!', 'error');
             }
         }
-
         function showMenu() {
             document.getElementById("login-section").style.display = "none";
             document.getElementById("homepage").style.display = "block";
         }
-
         function logout() {
             localStorage.removeItem("isLoggedIn");
             const username = document.getElementById("username").value = '';
@@ -257,9 +237,7 @@
             document.getElementById("login-section").style.display = "block";
             document.getElementById("homepage").style.display = "none";
             clearCart();
-        }
-
-        // Check login state on page load
+        }       
         window.onload = function () {
             if (localStorage.getItem("isLoggedIn") === "true") {
                 showMenu();
@@ -268,8 +246,6 @@
                 document.getElementById("homepage").style.display = "none";
             }
         };
-
-
         function displayMenu(items = menuItems) {
             const menuDiv = document.getElementById('menu');
             menuDiv.innerHTML = ''; // Clear previous menu
@@ -284,8 +260,7 @@
                     <button class="btn btn-dark m-1 btnAdd" onclick="addToCart(${item.id}, 'full')">Full ₹${item.fullPrice}</button>
                     ${item.halfPrice ? `<button class="btn btn-primary m-1 btnAdd" onclick="addToCart(${item.id}, 'half')"> Half ₹${item.halfPrice}</button>` : ''}
                 </div>
-            </div>
-        `;
+            </div> `;
                 menuDiv.appendChild(itemDiv);
             });
             displayTotal();
@@ -296,7 +271,6 @@
                 displayMenu(); // Show all items if search is cleared
                 return;
             }
-
             const filteredItems = menuItems.filter(item => item.name.toLowerCase().includes(query));
             displayMenu(filteredItems);
         }
@@ -331,7 +305,6 @@
             document.getElementById("clearBtn").disabled = false;
             const qrCodeDiv = document.getElementById('qr-code');
             qrCodeDiv.innerHTML = `<div class="loader"></div>`;
-
             if (cart[index].quantity > 1) {
                 cart[index].quantity--;
             } else {
@@ -347,24 +320,18 @@
             document.getElementById('total').innerText = `Total: ₹${total}`;
         }
         let timerInterval;
-
         function checkout() {
             document.getElementById("clearBtn").disabled = true;
-
             if (cart.length === 0) {
                 alert('Your cart is empty.');
                 return;
             }
-
             let orderSummary = "🛒 Your Order:\n\n";
             cart.forEach(item => {
                 orderSummary += `${item.name} (${item.portion}) x${item.quantity} - ₹${item.price * item.quantity}\n`;
             });
-
             const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            orderSummary += `\n💰 Total Amount: ₹${total}`;
-
-            // Ask user for payment method
+            orderSummary += `\n💰 Total Amount: ₹${total}`;         
             Swal.fire({
                 title: 'Select Payment Method',
                 input: 'radio',
@@ -379,6 +346,7 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
+                    paymentmethod  = result.value;
                     if (result.value === 'cash') {
                         Swal.fire({
                             icon: 'success',
@@ -390,27 +358,24 @@
                             displayCart();
                             document.getElementById("clearBtn").disabled = false;
                             document.getElementById("print").style.display = "block";
-                            
-                        });
+                         });
                     } else {
+                        paymentmethod = 'Online';
                         generateQRCode(total);
                         document.getElementById("print").style.display = "block";
                     }
                 }
             });
         }
-
         function generateQRCode(total) {
             const qrData = `upi://pay?pa=7013063222@ybl&pn=Hotel&tn=Hotel Bill&am=${total}&cu=INR`;
             const encodedQrData = encodeURIComponent(qrData);
             const qrCodeUrl = `https://quickchart.io/qr?text=${encodedQrData}&size=200`;
             const qrCodeDiv = document.getElementById('qr-code');
             qrCodeDiv.innerHTML = `<div class="loader"></div>`;
-
             let timeLeft = 180;
             if (timerInterval) clearInterval(timerInterval);
             let countdownDiv = document.getElementById("qr-timer");
-
             if (!countdownDiv) {
                 countdownDiv = document.createElement("p");
                 countdownDiv.id = "qr-timer";
@@ -418,12 +383,10 @@
                 countdownDiv.style.fontWeight = "bold";
                 qrCodeDiv.appendChild(countdownDiv);
             }
-
             timerInterval = setInterval(() => {
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
                 countdownDiv.innerText = `QR Code expires in: ${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     qrCodeDiv.innerHTML = '<p style="color:red;">QR Code Expired. Generate a new one.</p>';
@@ -432,7 +395,6 @@
                 }
                 timeLeft--;
             }, 1000);
-
             setTimeout(() => {
                 qrCodeDiv.innerHTML = ''; // Clear loader
                 const qrImage = new Image();
@@ -448,11 +410,9 @@
                         willClose: () => {
                             clearInterval(timerInterval);
                             qrCodeDiv.innerHTML = '<p style="color:red;">QR Code Expired. Generate a new one.</p>';
-
                             document.getElementById("clearBtn").disabled = false;
                         }
                     });
-
                     timerInterval = setInterval(() => {
                         const minutes = Math.floor(timeLeft / 60);
                         const seconds = timeLeft % 60;
@@ -461,20 +421,15 @@
                         if (timeLeft <= 0) {
                             clearInterval(timerInterval);
                             Swal.close();
-
                         }
                         timeLeft--;
                     }, 1000);
                 };
-
             }, 1000);
-
             displayCart();
-
         }
         function clearCart() {
             if (cart.length != 0) {
-
                 const qrCodeDiv = document.getElementById('qr-code');
                 qrCodeDiv.innerHTML = '';
                 displayCart();
@@ -487,17 +442,13 @@
                     document.getElementById("print").style.display = "none";
                     displayCart();
                 } else {
-
                     console.log("User clicked Cancel");
                 }
-
             }
             else {
                 alert('🛒 Cartis empty.');
             }
         }
-
-
         let orderCount = 0; 
         function printReceipt() {
             orderCount ++;
@@ -511,6 +462,7 @@
 
              orderSummary = `<h2>Order Details</h2>
                 <h1>Order Count: ${orderCount}</h1>`
+                orderSummary +=` <h3> paymentmethod  :${paymentmethod}</h3>` 
              orderSummary += dateTime;
             orderSummary += "<table  width='100%' style='display:flex; border: transparent; '>";
             orderSummary += "<tr><th>Item</th><th style='Margin-left : 50px'>Quantity</th><th style='Margin-left : 50px'>Price</th></tr>";
@@ -525,7 +477,6 @@
             <td>₹${itemTotal}</td>
         </tr>`;
             });
-
             orderSummary += `</table>
      <hr/>
     <h3>Total Amount: ₹${totalAmount}</h3>
@@ -545,5 +496,4 @@
         displayMenu();
     </script>
 </body>
-
 </html>
